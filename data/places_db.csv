@@ -1,0 +1,49 @@
+Destination,Name,Category,Cost,Address,Environment,Best_Time,Latitude,Longitude
+Đà Lạt,Khu du lịch Langbiang,Khám phá,150000,Thị trấn Lạc Dương,Ngoài trời,Sáng/Chiều,12.046944,108.428333
+Đà Lạt,Chợ đêm Đà Lạt,Ẩm thực,200000,Nguyễn Thị Minh Khai,Ngoài trời,Tối,11.942220,108.437220
+Đà Lạt,Quán Cafe Túi Mơ To,Thư giãn,80000,Hẻm 31 Sào Nam,Trong nhà/Có mái che,Chiều/Tối,11.946310,108.471410
+Đà Lạt,Thác Datanla,Khám phá,250000,Đèo Prenn,Ngoài trời,Sáng/Trưa,11.902230,108.449210
+Đà Lạt,Phở Thìn Hà Nội,Ẩm thực,60000,Hai Bà Trưng,Trong nhà,Sáng/Trưa/Tối,11.946520,108.435110
+Đà Lạt,Bảo tàng Lâm Đồng,Văn hóa,40000,Hùng Vương,Trong nhà,Sáng/Chiều,11.944260,108.461750
+Đà Lạt,Hồ Xuân Hương,Thư giãn,0,Trung tâm Đà Lạt,Ngoài trời,Sáng/Chiều,11.941600,108.444600
+Đà Lạt,Chùa Linh Phước,Văn hóa,0,Trại Mát,Trong nhà/Ngoài trời,Sáng/Chiều,11.944400,108.498800
+Đà Lạt,Lẩu bò Ba Toa,Ẩm thực,200000,Hoàng Diệu,Trong nhà,Trưa/Tối,11.936600,108.431200
+Đà Lạt,Kem bơ Thanh Thảo,Ẩm thực,30000,Nguyễn Văn Trỗi,Trong nhà,Sáng/Chiều/Tối,11.945800,108.438500
+TP.HCM,Dinh Độc Lập,Văn hóa,40000,Nam Kỳ Khởi Nghĩa (Quận 1),Trong nhà/Ngoài trời,Sáng/Chiều,10.776900,106.695100
+TP.HCM,Phố đi bộ Nguyễn Huệ,Thư giãn,0,Nguyễn Huệ (Quận 1),Ngoài trời,Tối,10.774300,106.703100
+TP.HCM,Chợ Bến Thành,Ẩm thực,200000,Lê Lợi (Quận 1),Trong nhà,Sáng/Chiều,10.772500,106.698000
+TP.HCM,Bùi Viện,Thư giãn,300000,Bùi Viện (Quận 1),Ngoài trời/Trong nhà,Tối,10.767400,106.693800
+TP.HCM,Landmark 81,Khám phá,250000,Vinhomes Central Park (Bình Thạnh),Trong nhà,Sáng/Tối,10.795000,106.721800
+TP.HCM,Cơm tấm Ba Ghiền,Ẩm thực,80000,Đặng Văn Ngữ (Phú Nhuận),Trong nhà,Sáng/Trưa/Tối,10.794200,106.671000
+TP.HCM,Bảo tàng Chứng tích Chiến tranh,Văn hóa,40000,Võ Văn Tần (Quận 3),Trong nhà,Sáng/Chiều,10.779500,106.692000
+Vũng Tàu,Tượng Chúa Kito,Khám phá,0,Núi Nhỏ,Ngoài trời,Sáng sớm/Chiều mát,10.326710,107.084120
+Vũng Tàu,Bãi Sau,Thư giãn,100000,Đường Thùy Vân,Ngoài trời,Sáng/Chiều,10.342500,107.094500
+Vũng Tàu,Bánh khọt Gốc Vú Sữa,Ẩm thực,70000,Nguyễn Trường Tộ,Trong nhà,Sáng/Trưa,10.344400,107.080510
+Vũng Tàu,Hải đăng Vũng Tàu,Khám phá,0,Đỉnh núi Nhỏ,Ngoài trời,Chiều/Tối,10.334120,107.075410
+Vũng Tàu,Chợ hải sản Xóm Lưới,Ẩm thực,300000,Phan Bội Châu,Trong nhà,Chiều/Tối,10.340200,107.078100
+Vũng Tàu,Bạch Dinh,Văn hóa,15000,Trần Phú,Trong nhà/Ngoài trời,Sáng/Chiều,10.340500,107.071700
+Vũng Tàu,Lẩu cá đuối Trương Công Định,Ẩm thực,150000,Trương Công Định,Trong nhà,Trưa/Tối,10.346800,107.081500
+Đà Nẵng,Bà Nà Hills,Khám phá,900000,Xã Hòa Ninh,Ngoài trời/Trong nhà,Sáng/Chiều,15.997800,107.987500
+Đà Nẵng,Cầu Rồng,Khám phá,0,Nguyễn Văn Linh,Ngoài trời,Tối,16.061400,108.227200
+Đà Nẵng,Chợ Cồn,Ẩm thực,150000,Hùng Vương,Trong nhà,Sáng/Chiều,16.069600,108.214000
+Đà Nẵng,Bãi biển Mỹ Khê,Thư giãn,0,Võ Nguyên Giáp,Ngoài trời,Sáng sớm/Chiều,16.059200,108.246100
+Đà Nẵng,Chùa Linh Ứng,Văn hóa,0,Bán đảo Sơn Trà,Ngoài trời,Sáng/Chiều,16.100000,108.277500
+Đà Nẵng,Ngũ Hành Sơn,Khám phá,40000,Hòa Hải,Ngoài trời/Trong nhà,Sáng/Chiều,16.002800,108.263800
+Hội An,Phố cổ Hội An,Khám phá,120000,Phường Minh An,Ngoài trời,Chiều/Tối,15.877100,108.328300
+Hội An,Bánh mì Phượng,Ẩm thực,35000,Phan Châu Trinh,Trong nhà,Sáng/Trưa/Tối,15.878900,108.330800
+Hội An,Rừng dừa Bảy Mẫu,Khám phá,150000,Xã Cẩm Thanh,Ngoài trời,Sáng/Chiều,15.872200,108.373200
+Hội An,Chợ đêm Hội An,Ẩm thực,150000,Nguyễn Hoàng,Ngoài trời,Tối,15.875800,108.326200
+Hội An,Làng gốm Thanh Hà,Văn hóa,35000,Thanh Hà,Ngoài trời/Trong nhà,Sáng/Chiều,15.877600,108.303100
+Phú Quốc,VinWonders Phú Quốc,Khám phá,950000,Bãi Dài,Ngoài trời/Trong nhà,Sáng/Chiều,10.334700,103.856900
+Phú Quốc,Chợ đêm Phú Quốc,Ẩm thực,250000,Đường Bạch Đằng,Ngoài trời,Tối,10.216800,103.960200
+Phú Quốc,Bãi Sao,Thư giãn,50000,Thị trấn An Thới,Ngoài trời,Sáng/Chiều,10.052100,104.034500
+Phú Quốc,Grand World Phú Quốc,Khám phá,0,Bãi Dài,Ngoài trời,Sáng/Tối,10.325500,103.854000
+Phú Quốc,Safari Phú Quốc,Khám phá,650000,Bãi Dài,Ngoài trời,Sáng/Trưa,10.340100,103.876500
+Nha Trang,Hòn Mun,Khám phá,300000,Đảo Hòn Mun,Ngoài trời,Sáng/Trưa,12.166700,109.300000
+Nha Trang,Nem nướng Đặng Văn Quyên,Ẩm thực,60000,Lãn Ông,Trong nhà,Trưa/Tối,12.253000,109.195000
+Nha Trang,Tháp Bà Ponagar,Văn hóa,30000,Đường 2 Tháng 4,Ngoài trời,Sáng/Chiều,12.265300,109.195800
+Sapa,Fansipan Legend,Khám phá,850000,Nguyễn Chí Thanh,Ngoài trời,Sáng/Trưa,22.304500,103.774400
+Sapa,Bản Cát Cát,Văn hóa,150000,San Sả Hồ,Ngoài trời,Sáng/Chiều,22.324200,103.829000
+Sapa,Cộng Cà Phê Sapa,Thư giãn,60000,Xuân Viên,Trong nhà,Sáng/Tối,22.334100,103.843000
+Sapa,Nhà thờ đá Sapa,Văn hóa,0,Trung tâm Sapa,Ngoài trời,Sáng/Tối,22.335300,103.842700
+Sapa,Thác Bạc,Khám phá,20000,Quốc lộ 4D,Ngoài trời,Sáng/Chiều,22.362100,103.778800
