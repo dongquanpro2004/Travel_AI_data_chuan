@@ -1,91 +1,120 @@
 import os
-import tensorflow as tf
+import re  # Thêm thư viện re để quét link từ Bing
+import torch
 import numpy as np
-import pandas as pd
-from tensorflow.keras.preprocessing import image
+import requests
+from PIL import Image
+from transformers import CLIPProcessor, CLIPModel
+from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL_PATH = os.getenv('MODEL_PATH') 
 
+# ==========================================
+# KHỞI TẠO CLIP VÀ LOAD TEXT VECTOR DATABASE
+# ==========================================
 try:
-    model = tf.keras.models.load_model(MODEL_PATH)
+    print("Đang khởi tạo AI Travel Lens (CLIP)...")
+    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    
+    # Load vector của kho ảnh đồ ăn (Khởi tạo đường dẫn động)
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    food_db_vectors = np.load(os.path.join(base_dir, 'data', 'food_image_clip_db.npy'))
+    food_db_labels = np.load(os.path.join(base_dir, 'data', 'food_image_labels.npy'))
 except Exception as e:
-    print(f"Lỗi khi load model: {e}")
+    print(f"Lỗi khi load CLIP model hoặc vector DB món ăn: {e}")
     model = None
 
-CONFIDENCE_THRESHOLD = 0.3
+SIMILARITY_THRESHOLD = 0.22 
+
+def get_related_images_bing(food_vietnamese_name, num_images=6):
+    """
+    Cào link ảnh trực tiếp từ Bing Images. 
+    Không bị block 403, miễn phí vĩnh viễn và trả về URL xịn.
+    """
+    search_query = f"món ăn {food_vietnamese_name} Việt Nam ngon thực tế".replace(' ', '+')
+    url = f"https://www.bing.com/images/search?q={search_query}"
+    
+    # Đóng giả làm trình duyệt Chrome
+    headers = {
+        "LeQuanDat": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=5)
+        
+        # Dùng Regex lôi đầu link ảnh gốc ra từ mã nguồn của Bing
+        image_urls = re.findall(r'murl&quot;:&quot;(.*?)&quot;', response.text)
+        
+        # Xóa các link trùng lặp (nếu có) và cắt đúng số lượng
+        clean_urls = list(dict.fromkeys(image_urls))
+        return clean_urls[:num_images]
+        
+    except Exception as e:
+        print(f"Lỗi khi cào ảnh từ Bing: {e}")
+        return []
 
 def predict_vietnamese_food(img_path):
     if model is None:
-        return {"error": "Model chưa sẵn sàng"}
+        return {"error": "Model CLIP chưa sẵn sàng"}
     
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    
-    predictions = model.predict(img_array)
-    max_probability = np.max(predictions[0])
-    
-    if max_probability < CONFIDENCE_THRESHOLD:
-        return {
-            "status": "rejected", 
-            "message": "Ảnh này có vẻ không phải là món ăn Việt Nam mà hệ thống biết. Vui lòng thử lại!",
-            "confidence": float(max_probability)
-        }
-    
-    predicted_class_index = np.argmax(predictions[0])
-    class_names = [
-        'Banh beo', 'Banh bot loc', 'Banh can', 'Banh canh', 'Banh chung', 
-        'Banh cuon', 'Banh duc', 'Banh gio', 'Banh khot', 'Banh mi', 
-        'Banh pia', 'Banh tet', 'Banh trang nuong', 'Banh xeo', 'Bun bo Hue', 
-        'Bun dau mam tom', 'Bun mam', 'Bun rieu', 'Bun thit nuong', 'Ca kho to', 
-        'Canh chua', 'Cao lau', 'Chao long', 'Com tam', 'Goi cuon', 
-        'Hu tieu', 'Mi quang', 'Nem chua', 'Pho', 'Xoi xeo'
-    ]
-    predicted_food_name = class_names[predicted_class_index]
-    
-    # ==========================================
-    # LOGIC: TỪ ĐIỂN 30 MÓN ĂN VÀ TÌM KIẾM DATABASE
-    # ==========================================
-    suggested_places = []
     try:
-        csv_path = os.path.join('data', 'places_db.csv')
-        df = pd.read_csv(csv_path)
+        # Xử lý ảnh đầu vào bằng CLIP
+        img = Image.open(img_path).convert("RGB")
+        inputs = processor(images=img, return_tensors="pt")
         
-        # Ánh xạ tên tiếng Anh không dấu thành từ khóa tiếng Việt chuẩn nhất để dò tìm
-        search_keywords = {
-            'Banh beo': 'bánh bèo', 'Banh bot loc': 'bột lọc', 'Banh can': 'bánh căn', 
-            'Banh canh': 'bánh canh', 'Banh chung': 'bánh chưng', 'Banh cuon': 'bánh cuốn', 
-            'Banh duc': 'bánh đúc', 'Banh gio': 'bánh giò', 'Banh khot': 'khọt', 
-            'Banh mi': 'bánh mì', 'Banh pia': 'bánh pía', 'Banh tet': 'bánh tét', 
-            'Banh trang nuong': 'bánh tráng', 'Banh xeo': 'bánh xèo', 'Bun bo Hue': 'bún bò', 
-            'Bun dau mam tom': 'bún đậu', 'Bun mam': 'bún mắm', 'Bun rieu': 'bún riêu', 
-            'Bun thit nuong': 'bún thịt nướng', 'Ca kho to': 'cá kho', 'Canh chua': 'canh chua', 
-            'Cao lau': 'cao lầu', 'Chao long': 'cháo lòng', 'Com tam': 'tấm', 
-            'Goi cuon': 'gỏi cuốn', 'Hu tieu': 'hủ tiếu', 'Mi quang': 'mì quảng', 
-            'Nem chua': 'nem chua', 'Pho': 'phở', 'Xoi xeo': 'xôi xéo'
-        }
-        
-        keyword = search_keywords.get(predicted_food_name, predicted_food_name)
-        
-        # Lọc database tìm quán có bán món này (tìm trong cột Name)
-        filtered_df = df[df['Name'].str.contains(keyword, case=False, na=False)]
-        
-        for _, row in filtered_df.head(2).iterrows(): 
-            suggested_places.append({
-                "name": row['Name'],
-                "destination": row['Destination'],
-                "cost": row['Cost'],
-                "address": row.get('Address', 'Đang cập nhật') # Lấy thêm địa chỉ nếu có
-            })
+        with torch.no_grad():
+            image_features = model.get_image_features(**inputs)
             
+            # Ép lấy Tensor để tương thích mọi version transformers
+            if not isinstance(image_features, torch.Tensor):
+                if hasattr(image_features, 'image_embeds'):
+                    image_features = image_features.image_embeds
+                elif hasattr(image_features, 'pooler_output'):
+                    image_features = image_features.pooler_output
+                else:
+                    image_features = image_features[0]
+                    
+            # Chuẩn hóa Vector ảnh
+            image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True)
+            client_vec = image_features.cpu().numpy()
+            
+        # Tính độ tương đồng
+        sim_scores = cosine_similarity(client_vec, food_db_vectors)[0]
+        best_match_idx = np.argmax(sim_scores)
+        max_similarity = sim_scores[best_match_idx]
+        
+        if max_similarity < SIMILARITY_THRESHOLD:
+            return {
+                "status": "rejected", 
+                "message": "Ảnh này không giống món ăn Việt Nam nào trong dữ liệu. Hãy thử chụp rõ hơn!",
+                "confidence": float(max_similarity)
+            }
+            
+        predicted_food_name = food_db_labels[best_match_idx]
+        
     except Exception as e:
-        print("Lỗi dò database:", e)
+        return {"error": f"Lỗi xử lý ảnh: {str(e)}"}
 
     # ==========================================
-    # LOGIC: THÊM MÔ TẢ MÓN ĂN
+    # LOGIC: TỪ ĐIỂN MÓN ĂN
     # ==========================================
+    search_keywords = {
+        'Banh beo': 'bánh bèo', 'Banh bot loc': 'bột lọc', 'Banh can': 'bánh căn', 
+        'Banh canh': 'bánh canh', 'Banh chung': 'bánh chưng', 'Banh cuon': 'bánh cuốn', 
+        'Banh duc': 'bánh đúc', 'Banh gio': 'bánh giò', 'Banh khot': 'khọt', 
+        'Banh mi': 'bánh mì', 'Banh pia': 'bánh pía', 'Banh tet': 'bánh tét', 
+        'Banh trang nuong': 'bánh tráng', 'Banh xeo': 'bánh xèo', 'Bun bo Hue': 'bún bò', 
+        'Bun dau mam tom': 'bún đậu', 'Bun mam': 'bún mắm', 'Bun rieu': 'bún riêu', 
+        'Bun thit nuong': 'bún thịt nướng', 'Ca kho to': 'cá kho', 'Canh chua': 'canh chua', 
+        'Cao lau': 'cao lầu', 'Chao long': 'cháo lòng', 'Com tam': 'tấm', 
+        'Goi cuon': 'gỏi cuốn', 'Hu tieu': 'hủ tiếu', 'Mi quang': 'mì quảng', 
+        'Nem chua': 'nem chua', 'Pho': 'phở', 'Xoi xeo': 'xôi xéo'
+    }
+    
+    vietnamese_name = search_keywords.get(predicted_food_name, predicted_food_name).title()
+
     food_descriptions = {
         'Banh beo': 'Món bánh bềnh bồng miền Trung, làm từ bột gạo, mỏng và nhỏ, phủ tôm chấy, mỡ hành ăn cùng nước mắm ngọt.',
         'Banh bot loc': 'Đặc sản cố đô Huế làm từ bột sắn với nhân tôm thịt đậm đà, vỏ bánh dai dai sần sật bùng vị mặn ngọt.',
@@ -119,20 +148,19 @@ def predict_vietnamese_food(img_path):
         'Xoi xeo': 'Gói xôi ăn sáng tuổi thơ Hà Nội màu nghệ tươi roi rói, phủ đậu xanh xéo nhuyễn tơi xốp, hành phi và mỡ gà thơm nức.'
     }
 
+    # Dùng Bing để lấy mảng 6 link ảnh siêu xịn
+    lens_images = get_related_images_bing(vietnamese_name, num_images=6)
+
     # ==========================================
-    # TRẢ VỀ KẾT QUẢ JSON CHUẨN MỰC
+    # TRẢ VỀ JSON
     # ==========================================
     response_data = {
         "status": "success",
         "food_name": predicted_food_name,
-        "vietnamese_name": search_keywords.get(predicted_food_name, predicted_food_name).title(),
+        "vietnamese_name": vietnamese_name,
         "description": food_descriptions.get(predicted_food_name, "Món ăn đặc sắc của ẩm thực Việt Nam."),
-        "confidence": float(max_probability),
-        "suggestions": suggested_places
+        "confidence": float(max_similarity),
+        "visual_matches": lens_images 
     }
-    
-    # Nếu nhận diện được món nhưng database chưa có quán nào bán
-    if not suggested_places:
-        response_data["notice"] = "Hệ thống nhận diện thành công, nhưng hiện tại chưa có quán nào bán món này trong cẩm nang của chúng tôi."
         
     return response_data
